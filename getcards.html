@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <main id="desk"></main>
+
+    <script>
+        let deck_id = '';
+
+        async function shuffle() {
+            const res = await fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1');
+            const data = await res.json();
+            console.log(data);
+            deck_id = data['deck_id'];
+            dealCards();
+        }
+
+        shuffle();
+
+
+        function displayCards(cards) {
+            desk.innerHTML = cards.map(card => `<img src="${card.image}">`).join('');
+        }
+
+        async function dealCards() {
+            const res = await fetch(`https://deckofcardsapi.com/api/deck/${deck_id}/draw/?count=5`);
+            const data = await res.json();
+            console.log(data);
+            displayCards(data.cards)
+        }
+
+
+    </script>
+</body>
+</html>

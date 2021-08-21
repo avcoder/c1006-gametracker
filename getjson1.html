@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"/>
+</head>
+<body>
+
+    <main id="main" class="mw6 center"></main>
+
+
+    <script>
+        async function getGames() {
+            const res = await fetch('http://localhost/week12/api/getgames.php');
+            const data = await res.json();
+            console.log(data);
+            const games = data.games;
+            main.innerHTML = games.map(game => `
+            <article class="dt w-100 bb b--black-05 pb2 mt2" href="#0">
+                <div class="dtc w2 w3-ns v-mid">
+                    <img src="${game.photo ?? 'https://dummyimage.com/70x70'}" class="ba b--black-10 db br2 w2 w3-ns h2 h3-ns"/>
+                </div>
+                <div class="dtc v-mid pl3">
+                    <h1 class="f6 f5-ns fw6 lh-title black mv0">${game.title}</h1>
+                    <h2 class="f6 fw4 mt0 mb0 black-60">${game.genre} @ ${game.year}</h2>
+                </div>
+                <div class="dtc v-mid">
+                    <form class="w-100 tr">
+                        <a class="f6 link dim br1 ph3 pv2 mb2 dib white bg-purple" href="${game.url}">Play</a>
+                    </form>
+                </div>
+            </article>
+            `
+            ).join('');
+        }
+
+        getGames();
+
+    </script>
+</body>
+</html>

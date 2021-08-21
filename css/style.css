@@ -1,0 +1,20 @@
+.gamefont {
+  font-family: "Press Start 2P", cursive;
+  transform: rotate(-7deg);
+}
+
+.motion-expand {
+  animation: expandshrink 1s 2;
+}
+
+@keyframes expandshrink {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

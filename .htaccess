@@ -1,0 +1,6 @@
+ErrorDocument 404 https://lamp.computerstudi.es/~Albert2/comp1006/week12/404.php
+
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule (.*) https://lamp.computerstudi.es%{REQUEST_URI}
+

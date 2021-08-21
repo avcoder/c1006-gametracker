@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"
+    />
+    <style>
+      .hide {
+        display: none;
+      }
+
+      /* Credit for Spinner CSS: https://loading.io/css/ */
+      .lds-dual-ring {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+      }
+      .lds-dual-ring:after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border-radius: 50%;
+        border: 6px solid rgb(13, 134, 53);
+        border-color: rgb(34, 138, 60) transparent rgb(24, 167, 19) transparent;
+        animation: lds-dual-ring 0.7s linear infinite;
+      }
+      @keyframes lds-dual-ring {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1 style="text-align: center">80's ARCADE</h1>
+
+    <main
+      style="min-width: 60%; display: flex; flex-wrap: wrap"
+      id="main"
+      class="mw6 center"
+      style="display: flex; flex-wrap: wrap; justify-content: space-evenly"
+    >
+      <div id="spinner" class="lds-dual-ring" style="margin: 0 auto"></div>
+    </main>
+
+    <div class="flex items-center justify-center pa4">
+      <button
+        id="previous"
+        class="
+          hide
+          f5
+          no-underline
+          black
+          bg-animate
+          hover-bg-black hover-white
+          inline-flex
+          items-center
+          pa3
+          ba
+          border-box
+          mr4
+        "
+      >
+        <svg
+          class="w1"
+          data-icon="chevronLeft"
+          viewBox="0 0 32 32"
+          style="fill: currentcolor"
+        >
+          <title>chevronLeft icon</title>
+          <path d="M20 1 L24 5 L14 16 L24 27 L20 31 L6 16 z"></path>
+        </svg>
+        <span class="pl1">Previous</span>
+      </button>
+      <button
+        id="next"
+        class="
+          f5
+          no-underline
+          black
+          bg-animate
+          hover-bg-black hover-white
+          inline-flex
+          items-center
+          pa3
+          ba
+          border-box
+        "
+      >
+        <span class="pr1">Next</span>
+        <svg
+          class="w1"
+          data-icon="chevronRight"
+          viewBox="0 0 32 32"
+          style="fill: currentcolor"
+        >
+          <title>chevronRight icon</title>
+          <path d="M12 1 L26 16 L12 31 L8 27 L18 16 L8 5 z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <script>
+      let allGames = [];
+      let offset = 0;
+      const LIMIT = 8;
+
+      function hideSpinner() {
+        spinner.classList.add("hide");
+      }
+
+      async function getGames() {
+        const res = await fetch(
+          "https://lamp.computerstudi.es/~Albert2/comp1006/week12/api/getgames.php"
+        );
+        const data = await res.json();
+        console.log(data);
+        allGames = data;
+        hideSpinner();
+        displayNext();
+      }
+
+      function displayGames({ games = allGames } = {}) {
+        main.innerHTML = games
+          .map(
+            (game) => `
+            <article class="hide-child relative mb5 ba b--black-20 mw5 center" style="width: 200px">
+                <img height=150 src="${
+                  game.photo ?? "https://dummyimage.com/200x150"
+                }" class="db" alt="${game.title}" />
+                <div class="pa2 bt b--black-20">
+                <h2 class="f6 db">${game.title}</h2>
+                <p class="f6 gray mv1">${game.genre} @ ${game.year}</p>
+                <a class="link tc ph3 pv1 db bg-animate bg-dark-blue hover-bg-blue white f6 br1" href="${
+                  game.url
+                }">Play</a>
+                </div>
+                <a class="child absolute top-1 right-1 ba bw1 black-40 grow no-underline br-100 w1 h1 pa2 lh-solid b" href="#">×</a>
+            </article>
+            `
+          )
+          .join("");
+      }
+
+      function toggleNextPrev(offset) {
+        if (offset - LIMIT == 0) {
+          // hide prev button
+          previous.classList.add("hide");
+        } else {
+          previous.classList.remove("hide");
+        }
+
+        if (offset >= allGames.length) {
+          next.classList.add("hide");
+        } else {
+          next.classList.remove("hide");
+        }
+      }
+
+      function displayNext({ games = allGames } = {}) {
+        let counter = 0;
+        const filteredGames = games.filter((game, idx) => {
+          if ((idx >= offset) & (counter < LIMIT)) {
+            counter += 1;
+            return game;
+          }
+        });
+        offset += LIMIT;
+        displayGames({ games: filteredGames });
+        toggleNextPrev(offset);
+      }
+
+      function displayPrevious({ games = allGames } = {}) {
+        let counter = 0;
+        offset -= LIMIT;
+
+        const filteredGames = games.filter((game, idx) => {
+          if ((idx >= offset - LIMIT) & (counter < LIMIT)) {
+            counter += 1;
+            return game;
+          }
+        });
+
+        displayGames({ games: filteredGames });
+        toggleNextPrev(offset);
+      }
+
+      getGames();
+
+      next.addEventListener("click", displayNext);
+      previous.addEventListener("click", displayPrevious);
+    </script>
+  </body>
+</html>
